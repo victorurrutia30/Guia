@@ -16,19 +16,19 @@ namespace Guia6.Pages.Libros
         {
             try
             {
-                // Definimos una variable y le asignamos la cadena de conexión generada con el
+                // Definimos una variable y le asignamos la cadena de conexiï¿½n generada con el
                 // "Explorador de servidores"
                 string cadena = "Data Source=Victor\\MSSQLSERVER2022;Initial Catalog=Base2;Integrated Security=True;Trust Server Certificate=True";
 
-                // Creamos un objeto de la clase SQLConnection indicando como parámetro la cadena de conexión
+                // Creamos un objeto de la clase SQLConnection indicando como parï¿½metro la cadena de conexiï¿½n
                 SqlConnection conexion = new SqlConnection(cadena);
 
-                conexion.Open(); // Abrimos la conexión
+                conexion.Open(); // Abrimos la conexiï¿½n
 
                 // Creamos un objeto de la clase SqlCommand para consultar todos los registros de la tabla
                 SqlCommand comando = new SqlCommand("select * from Libros", conexion);
 
-                /* Creamos un objeto de la clase SqlDataReader e inicializándolo mediante la llamada del método ExecuteReader
+                /* Creamos un objeto de la clase SqlDataReader e inicializï¿½ndolo mediante la llamada del mï¿½todo ExecuteReader
                    de la clase SQLCommand */
                 SqlDataReader lector = comando.ExecuteReader();
 
@@ -39,7 +39,7 @@ namespace Guia6.Pages.Libros
                     libro.ISBN = lector.GetString(0);
                     libro.Titulo = lector.GetString(1);
                     libro.Autor = lector.GetString(2);
-                    libro.AñoPublicacion = lector.GetInt32(3);
+                    libro.AnioPublicacion = lector.GetInt32(3);
                     libro.Precio = lector.GetDecimal(4);
                     libro.FechaLectura = lector.GetDateTime(5);
                     libro.NumPaginas = lector.GetInt32(6);

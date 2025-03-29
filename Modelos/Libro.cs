@@ -21,7 +21,7 @@ namespace Guia6.Libros
 
         [Required(ErrorMessage = "El año de publicación es obligatorio")]
         [Display(Name = "Año de Publicación")]
-        public int AñoPublicacion { get; set; }
+        public int AnioPublicacion { get; set; }
 
         [Required(ErrorMessage = "El precio es obligatorio")]
         [Range(0, double.MaxValue, ErrorMessage = "Debe ser un valor positivo")]
