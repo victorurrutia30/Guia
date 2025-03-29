@@ -1,0 +1,675 @@
+================================================
+File: Program.cs
+================================================
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddRazorPages();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapRazorPages();
+
+app.Run();
+
+
+
+================================================
+File: Modelos/Libro.cs
+================================================
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Guia6.Libros
+{
+    public class Libro
+    {
+        // Propiedades para acceder a los campos de la tabla
+
+        [Required(ErrorMessage = "El código ISBN es obligatorio")]
+        [MaxLength(13, ErrorMessage = "El código ISBN debe tener máximo 13 caracteres")]
+        public string ISBN { get; set; }
+
+        [Required(ErrorMessage = "El Título es obligatorio")]
+        [StringLength(150, MinimumLength = 2, ErrorMessage = "El título debe tener como mínimo 2 caracteres")]
+        [Display(Name = "Título")]
+        public string Titulo { get; set; }
+
+        [Required(ErrorMessage = "El(los) autor(es) es (son) obligatorio(s)")]
+        [StringLength(150, MinimumLength = 10, ErrorMessage = "El nombre del autor debe tener como mínimo 10 caracteres")]
+        public string Autor { get; set; }
+
+        [Required(ErrorMessage = "El año de publicación es obligatorio")]
+        [Display(Name = "Año de Publicación")]
+        public int AnioPublicacion { get; set; }
+
+        [Required(ErrorMessage = "El precio es obligatorio")]
+        [Range(0, double.MaxValue, ErrorMessage = "Debe ser un valor positivo")]
+        [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "El campo debe ser un número válido con hasta dos decimales.")]
+        public decimal Precio { get; set; }
+        [Display(Name = "Fecha de última lectura")]
+        [DataType(DataType.Date)]
+        public DateTime FechaLectura { get; set; }
+        [Required(ErrorMessage = "El número de paginas es obligatorio")]
+        [Display(Name = "Número de páginas")]
+        public int NumPaginas { get; set; }
+
+    }
+}
+
+
+
+================================================
+File: Pages/Error.cshtml
+================================================
+﻿@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+<h3>Development Mode</h3>
+<p>
+    Swapping to the <strong>Development</strong> environment displays detailed information about the error that occurred.
+</p>
+<p>
+    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
+    It can result in displaying sensitive information from exceptions to end users.
+    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+    and restarting the app.
+</p>
+
+
+
+================================================
+File: Pages/Error.cshtml.cs
+================================================
+using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Guia6.Pages;
+
+[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+[IgnoreAntiforgeryToken]
+public class ErrorModel : PageModel
+{
+    public string? RequestId { get; set; }
+
+    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    private readonly ILogger<ErrorModel> _logger;
+
+    public ErrorModel(ILogger<ErrorModel> logger)
+    {
+        _logger = logger;
+    }
+
+    public void OnGet()
+    {
+        RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+    }
+}
+
+
+
+
+================================================
+File: Pages/Index.cshtml
+================================================
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+
+================================================
+File: Pages/Index.cshtml.cs
+================================================
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Guia6.Pages;
+
+public class IndexModel : PageModel
+{
+    private readonly ILogger<IndexModel> _logger;
+
+    public IndexModel(ILogger<IndexModel> logger)
+    {
+        _logger = logger;
+    }
+
+    public void OnGet()
+    {
+
+    }
+}
+
+
+
+================================================
+File: Pages/Privacy.cshtml
+================================================
+﻿@page
+@model PrivacyModel
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Use this page to detail your site's privacy policy.</p>
+
+
+
+================================================
+File: Pages/Privacy.cshtml.cs
+================================================
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Guia6.Pages;
+
+public class PrivacyModel : PageModel
+{
+    private readonly ILogger<PrivacyModel> _logger;
+
+    public PrivacyModel(ILogger<PrivacyModel> logger)
+    {
+        _logger = logger;
+    }
+
+    public void OnGet()
+    {
+    }
+}
+
+
+
+
+================================================
+File: Pages/_ViewImports.cshtml
+================================================
+﻿@using Guia6
+@namespace Guia6.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+
+================================================
+File: Pages/_ViewStart.cshtml
+================================================
+﻿@{
+    Layout = "_Layout";
+}
+
+
+
+================================================
+File: Pages/Libros/Crear.cshtml
+================================================
+﻿@page
+@model Guia6.Pages.Libros.CrearModel
+@{
+    ViewData["Title"] = "Crear Libro";
+}
+
+
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary pl-3">Crear Libro</h2>
+            <hr />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.ISBN"></label>
+            <input asp-for="NewLibro.ISBN" class="form-control" />
+            <span asp-validation-for="NewLibro.ISBN" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.Titulo"></label>
+            <input asp-for="NewLibro.Titulo" class="form-control" />
+            <span asp-validation-for="NewLibro.Titulo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.Autor"></label>
+            <input asp-for="NewLibro.Autor" class="form-control" />
+            <span asp-validation-for="NewLibro.Autor" class="text-danger"></span>
+		</div>
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.AnioPublicacion"></label>
+            <input asp-for="NewLibro.AnioPublicacion" class="form-control" />
+            <span asp-validation-for="NewLibro.AnioPublicacion" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.Precio"></label>
+            <input asp-for="NewLibro.Precio" class="form-control" />
+            <span asp-validation-for="NewLibro.Precio" class="text-danger"></span>
+        </div>
+
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.FechaLectura"></label>
+            <input asp-for="NewLibro.FechaLectura" class="form-control" />
+            <span asp-validation-for="NewLibro.FechaLectura" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewLibro.NumPaginas"></label>
+            <input asp-for="NewLibro.NumPaginas" class="form-control" />
+            <span asp-validation-for="NewLibro.NumPaginas" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:150px;">Crear</button>
+        <a asp-page="Index" class="btn btn-secondary" style="width:200px;">Regresar al Listado</a>
+	</div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+
+================================================
+File: Pages/Libros/Crear.cshtml.cs
+================================================
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Guia6.Libros;
+using Microsoft.Data.SqlClient;
+
+
+namespace Guia6.Pages.Libros
+{
+    public class CrearModel : PageModel
+    {
+        [BindProperty]
+        public Libro NewLibro { get; set; }
+        public void OnGet()
+        {
+        }
+
+        public void OnPost()
+        {
+            if (NewLibro.AnioPublicacion.ToString().Length == 0)
+            {
+                ModelState.AddModelError("NewLibro.AnioPublicacion", "El anio de publicaci n es obligatorio");
+            }
+
+            // verificar si no hay mensajes de error
+            if (ModelState.IsValid)
+            {
+                // pasar a los atributos del objeto lo digitado y seleccionado por el usuario
+                NewLibro.ISBN = Request.Form["NewLibro.ISBN"];
+                NewLibro.Titulo = Request.Form["NewLibro.Titulo"];
+                NewLibro.Autor = Request.Form["NewLibro.Autor"];
+                NewLibro.AnioPublicacion = int.Parse(Request.Form["NewLibro.AnioPublicacion"]);
+                NewLibro.Precio = decimal.Parse(Request.Form["NewLibro.Precio"]);
+                NewLibro.FechaLectura = DateTime.Parse(Request.Form["NewLibro.FechaLectura"]);
+                NewLibro.NumPaginas = int.Parse(Request.Form["NewLibro.NumPaginas"]);
+
+                try
+                {
+                    // Definimos una variable y le asignamos la cadena de conexi n generada con el
+                    // "Explorador de servidores"
+                    string cadena = "Data Source=Victor\\MSSQLSERVER2022;Initial Catalog=Base2;Integrated Security=True;Trust Server Certificate=True";
+
+                    // Creamos un objeto de la clase SqlConnection indicando como par metro la
+                    // cadena de conexi n creada anteriormente
+                    SqlConnection conexion = new SqlConnection(cadena);
+
+                    conexion.Open(); // Abrimos la conexi n
+
+                    // Crear el query
+                    string query = "insert into Libros (ISBN, Titulo, Autor, AnioPublicacion, Precio, FechaUltimaLectura, NumPaginas) " +
+                                   "values(@ISBN, @Titulo, @Autor, @AnioPublicacion, @Precio, @FechaUltimaLectura, @NumPaginas);";
+                    // Creamos un objeto de la clase SqlCommand
+                    SqlCommand comando = new SqlCommand(query, conexion);
+
+                    // Pasar datos ingresados a los par metros
+                    comando.Parameters.AddWithValue("@ISBN", NewLibro.ISBN);
+                    comando.Parameters.AddWithValue("@Titulo", NewLibro.Titulo);
+                    comando.Parameters.AddWithValue("@Autor", NewLibro.Autor);
+                    comando.Parameters.AddWithValue("@AnioPublicacion", NewLibro.AnioPublicacion);
+                    comando.Parameters.AddWithValue("@Precio", NewLibro.Precio);
+                    comando.Parameters.AddWithValue("@FechaUltimaLectura", NewLibro.FechaLectura);
+                    comando.Parameters.AddWithValue("@NumPaginas", NewLibro.NumPaginas);
+
+                    // Le indicamos a SQL Server que ejecute el comando especificado anteriormente
+                    comando.ExecuteNonQuery();
+                    conexion.Close();  // Cerramos conexi n
+
+                    TempData["mensajeExito"] = "El libro se ha creado exitosamente";
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.ToString());
+                }
+
+                // Redirigir a la p gina  Index 
+                Response.Redirect("/Libros/Index");
+
+            }
+        }
+    }
+
+}
+
+
+
+================================================
+File: Pages/Libros/Index.cshtml
+================================================
+﻿@page
+@model Guia6.Pages.Libros.IndexModel
+@{
+    ViewData["Title"] = "Listado de Libros";
+}
+
+@if (TempData["mensajeExito"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script type="text/javascript">
+    toastr.success('@TempData["mensajeExito"]');
+</script>    
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Libros</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-page="Crear" class="btn btn-primary">
+                <i class="bi bi-plus-square"></i>Crear Nuevo Libro
+                </a>
+        </div>
+    </div>
+
+    <br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead style="text-align:center">
+            <tr>
+                <th>ISBN</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Año Publicación</th>
+                <th>Precio</th>
+                <th>@Html.DisplayNameFor(m => m.listaLibros.First().FechaLectura)</th>
+                <th>No. Páginas</th>
+                <th>Acciones</th>
+            </tr>
+		</thead>
+        <tbody>
+            @foreach (var obj in Model.listaLibros)
+            {
+                <tr>
+                    <td width="15%">@obj.ISBN</td>
+                    <td width="40%">@obj.Titulo</td>
+                    <td width="50%">@obj.Autor</td>
+                    <td width="10%" style="text-align:center">@obj.AnioPublicacion</td>
+                    <td width="10%">@obj.Precio</td>
+                    <td width="20%">@obj.FechaLectura.ToShortDateString()</td>
+                    <td width="10%">@obj.NumPaginas</td>
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+                            <a asp-page="Modificar" asp-route-id="@obj.ISBN" class="btn btn-success mx-2">
+                                <i class="bi bi-pencil-square"></i>Modificar
+                                </a>
+                            <a asp-page="Borrar" asp-route-id="@obj.ISBN" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash-fill"></i>Borrar
+                                </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+	</table>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.alert-success').show();
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 2000);
+        });
+    </script>
+}
+
+
+
+================================================
+File: Pages/Libros/Index.cshtml.cs
+================================================
+﻿using Guia6.Libros;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
+using System.ComponentModel;
+using System.Linq.Expressions;
+using Guia6.Pages.Libros;
+
+namespace Guia6.Pages.Libros
+{
+    
+    public class IndexModel : PageModel
+    {
+        public List<Libro> listaLibros = new List<Libro>();
+        public void OnGet()
+        {
+            try
+            {
+                // Definimos una variable y le asignamos la cadena de conexi n generada con el
+                // "Explorador de servidores"
+                string cadena = "Data Source=Victor\\MSSQLSERVER2022;Initial Catalog=Base2;Integrated Security=True;Trust Server Certificate=True";
+
+                // Creamos un objeto de la clase SQLConnection indicando como par metro la cadena de conexi n
+                SqlConnection conexion = new SqlConnection(cadena);
+
+                conexion.Open(); // Abrimos la conexi n
+
+                // Creamos un objeto de la clase SqlCommand para consultar todos los registros de la tabla
+                SqlCommand comando = new SqlCommand("select * from Libros", conexion);
+
+                /* Creamos un objeto de la clase SqlDataReader e inicializ ndolo mediante la llamada del m todo ExecuteReader
+                   de la clase SQLCommand */
+                SqlDataReader lector = comando.ExecuteReader();
+
+                // Recorremos el SqlDataReader
+                while (lector.Read())
+                {
+                    Libro libro = new Libro(); // Creamos un objeto
+                    libro.ISBN = lector.GetString(0);
+                    libro.Titulo = lector.GetString(1);
+                    libro.Autor = lector.GetString(2);
+                    libro.AnioPublicacion = lector.GetInt32(3);
+                    libro.Precio = lector.GetDecimal(4);
+                    libro.FechaLectura = lector.GetDateTime(5);
+                    libro.NumPaginas = lector.GetInt32(6);
+
+                    listaLibros.Add(libro); // Agregamos el objeto a la lista
+                }
+
+                conexion.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+    }
+}
+
+
+
+
+================================================
+File: Pages/Shared/_Layout.cshtml
+================================================
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestion de Libros</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap_vapor.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Guia6.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Gestion Libros</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Libros/Index">Libros</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - Guia6 - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+   @*  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+================================================
+File: Pages/Shared/_Layout.cshtml.css
+================================================
+﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a {
+  color: #0077cc;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+
+
+
+================================================
+File: Pages/Shared/_ValidationScriptsPartial.cshtml
+================================================
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+

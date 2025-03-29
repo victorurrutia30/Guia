@@ -1,0 +1,24 @@
+﻿@page "{id?}"
+@model Guia6.Pages.Autores.BorrarModel
+@{
+    ViewData["Title"] = "Borrar Autor";
+}
+
+<h2 class="text-danger">¿Está seguro de eliminar este autor?</h2>
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Id Autor</dt>
+        <dd class="col-sm-10">@Model.Autor.IdAutor</dd>
+
+        <dt class="col-sm-2">Nombre del Autor</dt>
+        <dd class="col-sm-10">@Model.Autor.NombreAutor</dd>
+
+        <dt class="col-sm-2">Nacionalidad</dt>
+        <dd class="col-sm-10">@Model.Autor.Nacionalidad</dd>
+    </dl>
+</div>
+<form method="post">
+    <input type="hidden" asp-for="Autor.IdAutor" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>

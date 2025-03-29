@@ -1,0 +1,41 @@
+﻿@page "{id?}"
+@model Guia6.Pages.Autores.EditarModel
+@{
+    ViewData["Title"] = "Editar Autor";
+}
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary pl-3">Editar Autor</h2>
+            <hr />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Autor.IdAutor"></label>
+            <input asp-for="Autor.IdAutor" class="form-control" readonly />
+            <span asp-validation-for="Autor.IdAutor" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Autor.NombreAutor"></label>
+            <input asp-for="Autor.NombreAutor" class="form-control" />
+            <span asp-validation-for="Autor.NombreAutor" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Autor.Nacionalidad"></label>
+            <input asp-for="Autor.Nacionalidad" class="form-control" />
+            <span asp-validation-for="Autor.Nacionalidad" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:150px;">Guardar</button>
+        <a asp-page="Index" class="btn btn-secondary" style="width:200px;">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

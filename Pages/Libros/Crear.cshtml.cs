@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Guia6.Libros;
 using Microsoft.Data.SqlClient;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 
 namespace Guia6.Pages.Libros
 {
@@ -10,73 +11,105 @@ namespace Guia6.Pages.Libros
     {
         [BindProperty]
         public Libro NewLibro { get; set; }
+
+        // Lista de autores para el dropdown
+        public List<SelectListItem> Autores { get; set; }
+
         public void OnGet()
         {
+            CargarAutores();
         }
 
-        public void OnPost()
+        public IActionResult OnPost()
         {
-            if (NewLibro.AnioPublicacion.ToString().Length == 0)
-            {
-                ModelState.AddModelError("NewLibro.AnioPublicacion", "El anio de publicaci�n es obligatorio");
-            }
-
-            // verificar si no hay mensajes de error
             if (ModelState.IsValid)
             {
-                // pasar a los atributos del objeto lo digitado y seleccionado por el usuario
-                NewLibro.ISBN = Request.Form["NewLibro.ISBN"];
-                NewLibro.Titulo = Request.Form["NewLibro.Titulo"];
-                NewLibro.Autor = Request.Form["NewLibro.Autor"];
-                NewLibro.AnioPublicacion = int.Parse(Request.Form["NewLibro.AnioPublicacion"]);
-                NewLibro.Precio = decimal.Parse(Request.Form["NewLibro.Precio"]);
-                NewLibro.FechaLectura = DateTime.Parse(Request.Form["NewLibro.FechaLectura"]);
-                NewLibro.NumPaginas = int.Parse(Request.Form["NewLibro.NumPaginas"]);
-
                 try
                 {
-                    // Definimos una variable y le asignamos la cadena de conexi�n generada con el
-                    // "Explorador de servidores"
                     string cadena = "Data Source=Victor\\MSSQLSERVER2022;Initial Catalog=Base2;Integrated Security=True;Trust Server Certificate=True";
 
-                    // Creamos un objeto de la clase SqlConnection indicando como par�metro la
-                    // cadena de conexi�n creada anteriormente
-                    SqlConnection conexion = new SqlConnection(cadena);
+                    // Obtener el nombre del autor a partir del Id seleccionado
+                    string autorNombre = "";
+                    using (SqlConnection conexion = new SqlConnection(cadena))
+                    {
+                        conexion.Open();
+                        string queryAutor = "SELECT NombreAutor FROM Autores WHERE IdAutor = @IdAutor";
+                        using (SqlCommand comandoAutor = new SqlCommand(queryAutor, conexion))
+                        {
+                            comandoAutor.Parameters.AddWithValue("@IdAutor", NewLibro.IdAutor);
+                            object resultado = comandoAutor.ExecuteScalar();
+                            if (resultado != null)
+                            {
+                                autorNombre = resultado.ToString();
+                            }
+                        }
+                    }
 
-                    conexion.Open(); // Abrimos la conexi�n
+                    // Asignar el nombre del autor al campo Autor del objeto libro
+                    NewLibro.Autor = autorNombre;
 
-                    // Crear el query
-                    string query = "insert into Libros (ISBN, Titulo, Autor, AnioPublicacion, Precio, FechaUltimaLectura, NumPaginas) " +
-                                   "values(@ISBN, @Titulo, @Autor, @AnioPublicacion, @Precio, @FechaUltimaLectura, @NumPaginas);";
-                    // Creamos un objeto de la clase SqlCommand
-                    SqlCommand comando = new SqlCommand(query, conexion);
-
-                    // Pasar datos ingresados a los par�metros
-                    comando.Parameters.AddWithValue("@ISBN", NewLibro.ISBN);
-                    comando.Parameters.AddWithValue("@Titulo", NewLibro.Titulo);
-                    comando.Parameters.AddWithValue("@Autor", NewLibro.Autor);
-                    comando.Parameters.AddWithValue("@AnioPublicacion", NewLibro.AnioPublicacion);
-                    comando.Parameters.AddWithValue("@Precio", NewLibro.Precio);
-                    comando.Parameters.AddWithValue("@FechaUltimaLectura", NewLibro.FechaLectura);
-                    comando.Parameters.AddWithValue("@NumPaginas", NewLibro.NumPaginas);
-
-                    // Le indicamos a SQL Server que ejecute el comando especificado anteriormente
-                    comando.ExecuteNonQuery();
-                    conexion.Close();  // Cerramos conexi�n
-
+                    using (SqlConnection conexion = new SqlConnection(cadena))
+                    {
+                        conexion.Open();
+                        string query = "INSERT INTO Libros (ISBN, Titulo, Autor, IdAutor, AnioPublicacion, Precio, FechaUltimaLectura, NumPaginas) " +
+                                       "VALUES(@ISBN, @Titulo, @Autor, @IdAutor, @AnioPublicacion, @Precio, @FechaUltimaLectura, @NumPaginas)";
+                        using (SqlCommand comando = new SqlCommand(query, conexion))
+                        {
+                            comando.Parameters.AddWithValue("@ISBN", NewLibro.ISBN);
+                            comando.Parameters.AddWithValue("@Titulo", NewLibro.Titulo);
+                            comando.Parameters.AddWithValue("@Autor", NewLibro.Autor);
+                            comando.Parameters.AddWithValue("@IdAutor", NewLibro.IdAutor);
+                            comando.Parameters.AddWithValue("@AnioPublicacion", NewLibro.AnioPublicacion);
+                            comando.Parameters.AddWithValue("@Precio", NewLibro.Precio);
+                            comando.Parameters.AddWithValue("@FechaUltimaLectura", NewLibro.FechaLectura);
+                            comando.Parameters.AddWithValue("@NumPaginas", NewLibro.NumPaginas);
+                            comando.ExecuteNonQuery();
+                        }
+                    }
                     TempData["mensajeExito"] = "El libro se ha creado exitosamente";
-
+                    return RedirectToPage("Index");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error: " + ex.ToString());
+                    Console.WriteLine("Error: " + ex.Message);
                 }
+            }
 
-                // Redirigir a la p�gina �Index�
-                Response.Redirect("/Libros/Index");
+            // Si el ModelState no es válido, se recarga la lista de autores para volver a mostrarlos
+            CargarAutores();
+            return Page();
+        }
 
+        private void CargarAutores()
+        {
+            Autores = new List<SelectListItem>();
+            try
+            {
+                string cadena = "Data Source=Victor\\MSSQLSERVER2022;Initial Catalog=Base2;Integrated Security=True;Trust Server Certificate=True";
+                using (SqlConnection conexion = new SqlConnection(cadena))
+                {
+                    conexion.Open();
+                    string query = "SELECT IdAutor, NombreAutor FROM Autores";
+                    using (SqlCommand comando = new SqlCommand(query, conexion))
+                    {
+                        using (SqlDataReader lector = comando.ExecuteReader())
+                        {
+                            while (lector.Read())
+                            {
+                                Autores.Add(new SelectListItem
+                                {
+                                    Value = lector.GetInt32(0).ToString(),
+                                    Text = lector.GetString(1)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al cargar autores: " + ex.Message);
             }
         }
     }
-
 }

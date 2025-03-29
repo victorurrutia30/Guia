@@ -1,0 +1,65 @@
+﻿@page "{id?}"
+@model Guia6.Pages.Libros.ModificarModel
+@{
+    ViewData["Title"] = "Modificar Libro";
+}
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary pl-3">Modificar Libro</h2>
+            <hr />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.ISBN"></label>
+            <input asp-for="Libro.ISBN" class="form-control" readonly />
+            <span asp-validation-for="Libro.ISBN" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.Titulo"></label>
+            <input asp-for="Libro.Titulo" class="form-control" />
+            <span asp-validation-for="Libro.Titulo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.Autor"></label>
+            <input asp-for="Libro.Autor" class="form-control" />
+            <span asp-validation-for="Libro.Autor" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.AnioPublicacion"></label>
+            <input asp-for="Libro.AnioPublicacion" class="form-control" />
+            <span asp-validation-for="Libro.AnioPublicacion" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.Precio"></label>
+            <input asp-for="Libro.Precio" class="form-control" />
+            <span asp-validation-for="Libro.Precio" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.FechaLectura"></label>
+            <input asp-for="Libro.FechaLectura" class="form-control" />
+            <span asp-validation-for="Libro.FechaLectura" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Libro.NumPaginas"></label>
+            <input asp-for="Libro.NumPaginas" class="form-control" />
+            <span asp-validation-for="Libro.NumPaginas" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:150px;">Modificar</button>
+        <a asp-page="Index" class="btn btn-secondary" style="width:200px;">Regresar al Listado</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

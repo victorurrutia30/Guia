@@ -4,8 +4,6 @@
     ViewData["Title"] = "Crear Libro";
 }
 
-
-
 <form method="post">
     <div class="border p-3 mt-4">
         <div class="row pb-2">
@@ -25,11 +23,14 @@
             <span asp-validation-for="NewLibro.Titulo" class="text-danger"></span>
         </div>
 
+        <!-- Se reemplaza el campo de Autor por un dropdown -->
         <div class="mb-3">
-            <label asp-for="NewLibro.Autor"></label>
-            <input asp-for="NewLibro.Autor" class="form-control" />
-            <span asp-validation-for="NewLibro.Autor" class="text-danger"></span>
-		</div>
+            <label asp-for="NewLibro.IdAutor"></label>
+            <select asp-for="NewLibro.IdAutor" class="form-control" asp-items="Model.Autores">
+                <option value="">Seleccione un autor</option>
+            </select>
+            <span asp-validation-for="NewLibro.IdAutor" class="text-danger"></span>
+        </div>
 
         <div class="mb-3">
             <label asp-for="NewLibro.AnioPublicacion"></label>
@@ -42,7 +43,6 @@
             <input asp-for="NewLibro.Precio" class="form-control" />
             <span asp-validation-for="NewLibro.Precio" class="text-danger"></span>
         </div>
-
 
         <div class="mb-3">
             <label asp-for="NewLibro.FechaLectura"></label>
@@ -58,7 +58,7 @@
 
         <button type="submit" class="btn btn-primary" style="width:150px;">Crear</button>
         <a asp-page="Index" class="btn btn-secondary" style="width:200px;">Regresar al Listado</a>
-	</div>
+    </div>
 </form>
 
 @section Scripts {

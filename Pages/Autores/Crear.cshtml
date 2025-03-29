@@ -1,0 +1,35 @@
+﻿@page
+@model Guia6.Pages.Autores.CrearModel
+@{
+    ViewData["Title"] = "Crear Autor";
+}
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary pl-3">Crear Autor</h2>
+            <hr />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewAutor.NombreAutor"></label>
+            <input asp-for="NewAutor.NombreAutor" class="form-control" />
+            <span asp-validation-for="NewAutor.NombreAutor" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NewAutor.Nacionalidad"></label>
+            <input asp-for="NewAutor.Nacionalidad" class="form-control" />
+            <span asp-validation-for="NewAutor.Nacionalidad" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:150px;">Crear</button>
+        <a asp-page="Index" class="btn btn-secondary" style="width:200px;">Regresar al Listado</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

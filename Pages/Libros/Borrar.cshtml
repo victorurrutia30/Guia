@@ -1,0 +1,38 @@
+﻿@page "{id?}"
+@model Guia6.Pages.Libros.BorrarModel
+@{
+    ViewData["Title"] = "Borrar Libro";
+}
+
+<h2 class="text-danger">¿Está seguro de eliminar este libro?</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ISBN</dt>
+        <dd class="col-sm-10">@Model.Libro.ISBN</dd>
+
+        <dt class="col-sm-2">Título</dt>
+        <dd class="col-sm-10">@Model.Libro.Titulo</dd>
+
+        <dt class="col-sm-2">Autor</dt>
+        <dd class="col-sm-10">@Model.Libro.Autor</dd>
+
+        <dt class="col-sm-2">Año Publicación</dt>
+        <dd class="col-sm-10">@Model.Libro.AnioPublicacion</dd>
+
+        <dt class="col-sm-2">Precio</dt>
+        <dd class="col-sm-10">@Model.Libro.Precio</dd>
+
+        <dt class="col-sm-2">Fecha Lectura</dt>
+        <dd class="col-sm-10">@Model.Libro.FechaLectura.ToShortDateString()</dd>
+
+        <dt class="col-sm-2">No. Páginas</dt>
+        <dd class="col-sm-10">@Model.Libro.NumPaginas</dd>
+    </dl>
+</div>
+
+<form method="post">
+    <input type="hidden" asp-for="Libro.ISBN" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
